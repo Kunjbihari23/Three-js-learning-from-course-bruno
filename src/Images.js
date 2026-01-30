@@ -6,6 +6,8 @@ import normal from "../static/textures/door/normal.jpg";
 import ambiant from "../static/textures/door/ambientOcclusion.jpg";
 import metalness from "../static/textures/door/metalness.jpg";
 import roughness from "../static/textures/door/roughness.jpg";
+import CheckBoardBigImage from "../static/textures/checkerboard-1024x1024.png";
+import CheckBoardSmallImage from "../static/textures/checkerboard-8x8.png";
 
 export const IMAGES = {
   color: color,
@@ -16,4 +18,6 @@ export const IMAGES = {
   metalness: metalness,
   roughness: roughness,
   minecraft: MInecraftImage,
+  checkBoardBig: CheckBoardBigImage,
+  checkBoardSmall: CheckBoardSmallImage,
 };

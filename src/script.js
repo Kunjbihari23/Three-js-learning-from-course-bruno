@@ -33,7 +33,17 @@ LoadingManager.onLoad = (data) => {
 // New way of Texture Loading
 const textureLoader = new THREE.TextureLoader(LoadingManager);
 const colorTexture = textureLoader.load(IMAGES.color);
+const alpha = textureLoader.load(IMAGES.alpha);
+const height = textureLoader.load(IMAGES.height);
+const normal = textureLoader.load(IMAGES.normal);
+const ambiant = textureLoader.load(IMAGES.ambiant);
+const metalness = textureLoader.load(IMAGES.metalness);
+const roughness = textureLoader.load(IMAGES.roughness);
+const Minecraft = textureLoader.load(IMAGES.minecraft);
+const CheckBoxBig = textureLoader.load(IMAGES.checkBoardBig);
+const CheckBoxSmall = textureLoader.load(IMAGES.checkBoardSmall);
 
+//
 colorTexture.repeat.x = 1.5;
 colorTexture.repeat.y = 1.5;
 
@@ -47,13 +57,18 @@ colorTexture.generateMipmaps = false;
 colorTexture.minFilter = THREE.NearestFilter;
 colorTexture.magFilter = THREE.NearestFilter;
 
-const alpha = textureLoader.load(IMAGES.alpha);
-const height = textureLoader.load(IMAGES.height);
-const normal = textureLoader.load(IMAGES.normal);
-const ambiant = textureLoader.load(IMAGES.ambiant);
-const metalness = textureLoader.load(IMAGES.metalness);
-const roughness = textureLoader.load(IMAGES.roughness);
-const Minecraft = textureLoader.load(IMAGES.minecraft);
+// minecraft filters
+Minecraft.magFilter = THREE.NearestFilter;
+
+// this LinearMipmapLinearFilter in minFilter is default
+// CheckBoxBig.minFilter = THREE.LinearMipmapLinearFilter;
+// CheckBoxBig.minFilter = THREE.NearestFilter;
+// CheckBoxBig.generateMipmaps = false;
+THREE.NearestMipMapLinearFilter;
+THREE.NearestMipMapNearestFilter;
+
+CheckBoxSmall.magFilter = THREE.NearestFilter;
+
 // old way to load texture
 // const image = new Image();
 // const texture = new THREE.Texture(image);
@@ -74,7 +89,7 @@ console.log("🚀 ~ geometry:", geometry.attributes.uv);
 // const material = new THREE.MeshBasicMaterial({ map: ambiant });
 // const material = new THREE.MeshBasicMaterial({ map: metalness });
 // const material = new THREE.MeshBasicMaterial({ map: roughness });
-const material = new THREE.MeshBasicMaterial({ map: colorTexture });
+const material = new THREE.MeshBasicMaterial({ map: Minecraft });
 const mesh = new THREE.Mesh(geometry, material);
 scene.add(mesh);
 
