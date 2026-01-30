@@ -1,5 +1,5 @@
-import gradiant1 from "../static/textures/gradients/3.jpg";
-import gradiant2 from "../static/textures/gradients/5.jpg";
+import gradient1 from "../static/textures/gradients/3.jpg";
+import gradient2 from "../static/textures/gradients/5.jpg";
 
 import matcap1 from "../static/textures/matcaps/1.png";
 import matcap2 from "../static/textures/matcaps/2.png";
@@ -18,12 +18,10 @@ import metalness from "../static/textures/door/metalness.jpg";
 import normal from "../static/textures/door/normal.jpg";
 import roughness from "../static/textures/door/roughness.jpg";
 
-import environmentMap from "../static/textures/environmentMap/2k.hdr";
-
 export const IMAGES = {
-  gradiants: {
-    gradiant1,
-    gradiant2,
+  gradients: {
+    gradient1,
+    gradient2,
   },
   matcaps: {
     matcap1,
@@ -35,16 +33,13 @@ export const IMAGES = {
     matcap7,
     matcap8,
   },
-  environmentMap: {
-    environmentMap,
-  },
   door: {
+    color,
     alpha,
     ambientOcclusion,
-    color,
     height,
-    metalness,
     normal,
+    metalness,
     roughness,
   },
 };
