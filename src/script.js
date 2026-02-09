@@ -16,6 +16,99 @@ const canvas = document.querySelector("canvas.webgl");
 // Scene
 const scene = new THREE.Scene();
 
+const textureLoader = new THREE.TextureLoader();
+
+// floar texture
+
+const floarAlphaTexture = textureLoader.load("./floor/alpha.webp");
+const floarColorTexture = textureLoader.load(
+  "./floor/coast_sand_rocks_02_1k/coast_sand_rocks_02_diff_1k.webp",
+);
+const floarARMTexture = textureLoader.load(
+  "./floor/coast_sand_rocks_02_1k/coast_sand_rocks_02_arm_1k.webp",
+);
+const floarNormalTexture = textureLoader.load(
+  "./floor/coast_sand_rocks_02_1k/coast_sand_rocks_02_nor_gl_1k.webp",
+);
+const floarDisplacementTexture = textureLoader.load(
+  "./floor/coast_sand_rocks_02_1k/coast_sand_rocks_02_disp_1k.webp",
+);
+
+floarColorTexture.colorSpace = THREE.SRGBColorSpace;
+
+floarColorTexture.repeat.set(8, 8);
+floarARMTexture.repeat.set(8, 8);
+floarNormalTexture.repeat.set(8, 8);
+floarDisplacementTexture.repeat.set(8, 8);
+
+floarColorTexture.wrapS = THREE.RepeatWrapping;
+floarColorTexture.wrapT = THREE.RepeatWrapping;
+
+floarARMTexture.wrapS = THREE.RepeatWrapping;
+floarARMTexture.wrapT = THREE.RepeatWrapping;
+
+floarNormalTexture.wrapS = THREE.RepeatWrapping;
+floarNormalTexture.wrapT = THREE.RepeatWrapping;
+
+floarDisplacementTexture.wrapS = THREE.RepeatWrapping;
+floarDisplacementTexture.wrapT = THREE.RepeatWrapping;
+
+// wall texture
+
+const wallColorTexture = textureLoader.load(
+  "./wall/castle_brick_broken_06_1k/castle_brick_broken_06_diff_1k.webp",
+);
+const wallARMTexture = textureLoader.load(
+  "./wall/castle_brick_broken_06_1k/castle_brick_broken_06_arm_1k.webp",
+);
+const wallNormalTexture = textureLoader.load(
+  "./wall/castle_brick_broken_06_1k/castle_brick_broken_06_nor_gl_1k.webp",
+);
+
+wallColorTexture.colorSpace = THREE.SRGBColorSpace;
+
+// roof texture
+
+const roofColorTexture = textureLoader.load(
+  "./roof/roof_slates_02_1k/roof_slates_02_diff_1k.webp",
+);
+const roofARMTexture = textureLoader.load(
+  "./roof/roof_slates_02_1k/roof_slates_02_arm_1k.webp",
+);
+const roofNormalTexture = textureLoader.load(
+  "./roof/roof_slates_02_1k/roof_slates_02_nor_gl_1k.webp",
+);
+
+roofColorTexture.colorSpace = THREE.SRGBColorSpace;
+
+roofColorTexture.repeat.set(3, 1);
+roofARMTexture.repeat.set(3, 1);
+roofNormalTexture.repeat.set(3, 1);
+roofColorTexture.wrapS = THREE.RepeatWrapping;
+roofARMTexture.wrapS = THREE.RepeatWrapping;
+roofNormalTexture.wrapS = THREE.RepeatWrapping;
+
+// bushes texture
+
+const bushesColorTexture = textureLoader.load(
+  "./bush/leaves_forest_ground_1k/leaves_forest_ground_diff_1k.webp",
+);
+const bushesARMTexture = textureLoader.load(
+  "./bush/leaves_forest_ground_1k/leaves_forest_ground_arm_1k.webp",
+);
+const bushesNormalTexture = textureLoader.load(
+  "./bush/leaves_forest_ground_1k/leaves_forest_ground_nor_gl_1k.webp",
+);
+
+bushesColorTexture.colorSpace = THREE.SRGBColorSpace;
+
+bushesColorTexture.repeat.set(2, 1);
+bushesARMTexture.repeat.set(2, 1);
+bushesNormalTexture.repeat.set(2, 1);
+bushesColorTexture.wrapS = THREE.RepeatWrapping;
+bushesARMTexture.wrapS = THREE.RepeatWrapping;
+bushesNormalTexture.wrapS = THREE.RepeatWrapping;
+
 /**
  * House
  */
@@ -34,9 +127,34 @@ const floor = new THREE.Mesh(
   new THREE.PlaneGeometry(
     houseMesurements.planeSize,
     houseMesurements.planeSize,
+    100,
+    100,
   ),
-  new THREE.MeshStandardMaterial(),
+  new THREE.MeshStandardMaterial({
+    alphaMap: floarAlphaTexture,
+    transparent: true,
+    map: floarColorTexture,
+    aoMap: floarARMTexture,
+    roughnessMap: floarARMTexture,
+    metalnessMap: floarARMTexture,
+    normalMap: floarNormalTexture,
+    displacementMap: floarDisplacementTexture,
+    displacementScale: 0.3,
+    displacementBias: -0.2,
+  }),
 );
+gui
+  .add(floor.material, "displacementBias")
+  .min(-1)
+  .max(1)
+  .step(0.001)
+  .name("Displacement Bias");
+gui
+  .add(floor.material, "displacementScale")
+  .min(0)
+  .max(1)
+  .step(0.001)
+  .name("Displacement Scale");
 floor.rotation.x = -Math.PI * 0.5;
 scene.add(floor);
 
@@ -53,7 +171,13 @@ const walls = new THREE.Mesh(
     houseMesurements.height,
     houseMesurements.depth,
   ),
-  new THREE.MeshStandardMaterial(),
+  new THREE.MeshStandardMaterial({
+    map: wallColorTexture,
+    aoMap: wallARMTexture,
+    roughnessMap: wallARMTexture,
+    metalnessMap: wallARMTexture,
+    normalMap: wallNormalTexture,
+  }),
 );
 walls.position.y = houseMesurements.height / 2;
 houseGroup.add(walls);
@@ -65,7 +189,13 @@ const roof = new THREE.Mesh(
     houseMesurements.coneHeight,
     houseMesurements.coneSegments,
   ),
-  new THREE.MeshStandardMaterial(),
+  new THREE.MeshStandardMaterial({
+    map: roofColorTexture,
+    aoMap: roofARMTexture,
+    roughnessMap: roofARMTexture,
+    metalnessMap: roofARMTexture,
+    normalMap: roofNormalTexture,
+  }),
 );
 roof.position.y = houseMesurements.height + houseMesurements.coneHeight / 2;
 roof.rotation.y = Math.PI / 4;
@@ -83,7 +213,13 @@ houseGroup.add(door);
 
 // Bushes
 const bushGeometry = new THREE.SphereGeometry(1, 16, 16);
-const bushMaterial = new THREE.MeshStandardMaterial();
+const bushMaterial = new THREE.MeshStandardMaterial({
+  map: bushesColorTexture,
+  aoMap: bushesARMTexture,
+  roughnessMap: bushesARMTexture,
+  metalnessMap: bushesARMTexture,
+  normalMap: bushesNormalTexture,
+});
 
 const bush1 = new THREE.Mesh(bushGeometry, bushMaterial);
 bush1.scale.set(0.5, 0.5, 0.5);
@@ -113,7 +249,7 @@ const graveMaterial = new THREE.MeshStandardMaterial();
 
 for (let i = 0; i < 25; i++) {
   const angle = Math.random() * Math.PI * 2;
-  const radius = 3 + Math.random() * 4;
+  const radius = 4 + Math.random() * 9;
   const x = Math.sin(angle) * radius;
   const z = Math.cos(angle) * radius;
   const grave = new THREE.Mesh(graveGeometry, graveMaterial);
