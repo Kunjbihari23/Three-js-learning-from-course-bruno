@@ -45,8 +45,14 @@ ParticlesMaterial.color = new THREE.Color(0x00ff00);
 ParticlesMaterial.size = 0.08;
 ParticlesMaterial.sizeAttenuation = true;
 ParticlesMaterial.alphaMap = particalTexture;
-// ParticlesMaterial.alphaTest = 0.001;
-ParticlesMaterial.depthTest = false;
+
+/**
+ * this three can fix the proper rendering of alpha texture but best way is
+ * depthWrite false this will work very well also
+ * depthTest false work but issue is is generate unexpected results for other objs */
+// ParticlesMaterial.alphaTest = 0.001; // this will work but still got issue in some
+// ParticlesMaterial.depthTest = false;
+ParticlesMaterial.depthWrite = false;
 ParticlesMaterial.transparent = true;
 
 /**
