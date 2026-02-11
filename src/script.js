@@ -12,9 +12,10 @@ const parameters = {
   materialColor: "#ffeded",
 };
 
-gui
-  .addColor(parameters, "materialColor")
-  .onFinishChange(() => material.color.set(parameters.materialColor));
+gui.addColor(parameters, "materialColor").onFinishChange(() => {
+  material.color.set(parameters.materialColor);
+  particlesMaterial.color.set(parameters.materialColor);
+});
 
 /**
  * Base
@@ -41,6 +42,35 @@ const coneObj = new THREE.Mesh(cone, material);
 scene.add(torusObj, torusKnoteObj, coneObj);
 
 const meshObjs = [torusObj, torusKnoteObj, coneObj];
+
+/**
+ * Particles
+ */
+const count = 200;
+const position = new Float32Array(count * 3);
+const particlesGeometry = new THREE.BufferGeometry();
+
+for (let index = 0; index < count; index++) {
+  const i3 = index * 3;
+  position[i3 + 0] = (Math.random() - 0.5) * 10;
+  position[i3 + 1] =
+    objDistence * 0.5 - Math.random() * objDistence * meshObjs.length;
+  position[i3 + 2] = (Math.random() - 0.5) * 10;
+}
+
+particlesGeometry.setAttribute(
+  "position",
+  new THREE.BufferAttribute(position, 3),
+);
+
+const particlesMaterial = new THREE.PointsMaterial({
+  size: 0.05,
+  color: parameters.materialColor,
+  sizeAttenuation: true,
+});
+
+const particleMesh = new THREE.Points(particlesGeometry, particlesMaterial);
+scene.add(particleMesh);
 
 torusObj.position.y = -objDistence * 0;
 torusKnoteObj.position.y = -objDistence * 1;
@@ -104,6 +134,11 @@ window.addEventListener("mousemove", (e) => {
 });
 
 /**
+ * Camera Group
+ */
+const cameraGroup = new THREE.Group();
+scene.add(cameraGroup);
+/**
  * Camera
  */
 // Base camera
@@ -114,7 +149,7 @@ const camera = new THREE.PerspectiveCamera(
   100,
 );
 camera.position.z = 6;
-scene.add(camera);
+cameraGroup.add(camera);
 
 /**
  * Renderer
@@ -131,16 +166,20 @@ renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
  * Animate
  */
 const clock = new THREE.Clock();
+let previousTime = 0;
 
 const tick = () => {
   const elapsedTime = clock.getElapsedTime();
+  const deltaTime = elapsedTime - previousTime;
+  previousTime = elapsedTime;
+
+  camera.position.y = (-scrollY / sizes.height) * objDistence;
 
   const paralaxX = cursor.x;
   const paralaxY = -cursor.y;
 
-  camera.position.y = (-scrollY / sizes.height) * objDistence;
-  camera.position.x = paralaxX;
-  camera.position.y = paralaxY;
+  cameraGroup.position.x += (paralaxX - cameraGroup.position.x) * 5 * deltaTime;
+  cameraGroup.position.y += (paralaxY - cameraGroup.position.y) * 5 * deltaTime;
 
   for (const mesh of meshObjs) {
     mesh.rotation.x = elapsedTime * 0.1;
