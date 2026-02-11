@@ -6,7 +6,7 @@ import GUI from "lil-gui";
  * Base
  */
 // Debug
-const gui = new GUI();
+const gui = new GUI({ width: 350 });
 
 // Canvas
 const canvas = document.querySelector("canvas.webgl");
@@ -14,14 +14,143 @@ const canvas = document.querySelector("canvas.webgl");
 // Scene
 const scene = new THREE.Scene();
 
-/**
- * Test cube
- */
-const cube = new THREE.Mesh(
-  new THREE.BoxGeometry(1, 1, 1),
-  new THREE.MeshBasicMaterial(),
-);
-scene.add(cube);
+const parameters = {};
+parameters.count = 10000;
+parameters.size = 0.01;
+parameters.radius = 5;
+parameters.branches = 3;
+parameters.spin = 1;
+parameters.randomness = 0.2;
+parameters.randomnessPower = 7;
+parameters.insideColor = "#ffbb00";
+parameters.outsideColor = "#00bbff";
+
+let geometry = null;
+let material = null;
+let points = null;
+
+const galaxyGenerator = () => {
+  /**
+   * Galaxy
+   */
+
+  if (points !== null) {
+    geometry.dispose();
+    material.dispose();
+    scene.remove(points);
+  }
+
+  geometry = new THREE.BufferGeometry();
+  const positions = new Float32Array(parameters.count * 3);
+  const colors = new Float32Array(parameters.count * 3);
+
+  const InsideColor = new THREE.Color(parameters.insideColor);
+  const OutsideColor = new THREE.Color(parameters.outsideColor);
+
+  for (let index = 0; index < parameters.count; index++) {
+    const i3 = index * 3;
+    //position
+
+    const radius = Math.random() * parameters.radius;
+    const branchesAngle =
+      ((index % parameters.branches) / parameters.branches) * Math.PI * 2;
+    const spin = radius * parameters.spin;
+
+    const randomX =
+      Math.pow(Math.random(), parameters.randomnessPower) *
+      (Math.random() < 0.5 ? 1 : -1) *
+      parameters.randomness *
+      radius;
+    const randomY =
+      Math.pow(Math.random(), parameters.randomnessPower) *
+      (Math.random() < 0.5 ? 1 : -1) *
+      parameters.randomness *
+      radius;
+    const randomZ =
+      Math.pow(Math.random(), parameters.randomnessPower) *
+      (Math.random() < 0.5 ? 1 : -1) *
+      parameters.randomness *
+      radius;
+
+    positions[i3 + 0] = Math.cos(branchesAngle + spin) * radius + randomX;
+    positions[i3 + 1] = 0 + randomY;
+    positions[i3 + 2] = Math.sin(branchesAngle + spin) * radius + randomZ;
+
+    const mixedColor = InsideColor.clone();
+    mixedColor.lerp(OutsideColor, radius / parameters.radius);
+
+    // color
+    colors[i3 + 0] = mixedColor.r;
+    colors[i3 + 1] = mixedColor.g;
+    colors[i3 + 2] = mixedColor.b;
+  }
+
+  geometry.setAttribute("position", new THREE.BufferAttribute(positions, 3));
+  geometry.setAttribute("color", new THREE.BufferAttribute(colors, 3));
+
+  /**
+   * Material
+   */
+  material = new THREE.PointsMaterial({
+    size: parameters.size,
+    sizeAttenuation: true,
+    depthWrite: false, // use this for not over lap the other material and obj not overlap
+    blending: THREE.AdditiveBlending,
+    vertexColors: true,
+  });
+
+  /**
+   * Points
+   */
+  points = new THREE.Points(geometry, material);
+  scene.add(points);
+};
+galaxyGenerator();
+
+gui
+  .add(parameters, "count")
+  .min(1000)
+  .max(100000)
+  .step(100)
+  .onFinishChange(galaxyGenerator);
+gui
+  .add(parameters, "size")
+  .min(0.01)
+  .max(0.1)
+  .step(0.001)
+  .onFinishChange(galaxyGenerator);
+gui
+  .add(parameters, "radius")
+  .min(1)
+  .max(20)
+  .step(1)
+  .onFinishChange(galaxyGenerator);
+gui
+  .add(parameters, "branches")
+  .min(1)
+  .max(20)
+  .step(1)
+  .onFinishChange(galaxyGenerator);
+gui
+  .add(parameters, "spin")
+  .min(-5)
+  .max(5)
+  .step(0.001)
+  .onFinishChange(galaxyGenerator);
+gui
+  .add(parameters, "randomness")
+  .min(0)
+  .max(2)
+  .step(0.001)
+  .onFinishChange(galaxyGenerator);
+gui
+  .add(parameters, "randomnessPower")
+  .min(1)
+  .max(10)
+  .step(0.001)
+  .onFinishChange(galaxyGenerator);
+gui.addColor(parameters, "insideColor").onFinishChange(galaxyGenerator);
+gui.addColor(parameters, "outsideColor").onFinishChange(galaxyGenerator);
 
 /**
  * Sizes
