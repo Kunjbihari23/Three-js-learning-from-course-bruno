@@ -1,5 +1,6 @@
 import * as THREE from "three";
 import GUI from "lil-gui";
+import gsap from "gsap";
 
 /**
  * Debug
@@ -41,7 +42,7 @@ const torusKnoteObj = new THREE.Mesh(torusKnote, material);
 const coneObj = new THREE.Mesh(cone, material);
 scene.add(torusObj, torusKnoteObj, coneObj);
 
-const meshObjs = [torusObj, torusKnoteObj, coneObj];
+let meshObjs = [torusObj, torusKnoteObj, coneObj];
 
 /**
  * Particles
@@ -115,9 +116,23 @@ window.addEventListener("resize", () => {
  */
 
 let scrollY = window.scrollY;
+let currentSection = 0;
 
 window.addEventListener("scroll", () => {
   scrollY = window.scrollY;
+
+  let Section = Math.round(scrollY / sizes.height);
+
+  if (Section != currentSection) {
+    currentSection = Section;
+    gsap.to(meshObjs[currentSection].rotation, {
+      duration: 1.5,
+      ease: "power2.inOut",
+      x: "+=5",
+      y: "+=3",
+      z: "+=1",
+    });
+  }
 });
 
 /**
@@ -182,8 +197,8 @@ const tick = () => {
   cameraGroup.position.y += (paralaxY - cameraGroup.position.y) * 5 * deltaTime;
 
   for (const mesh of meshObjs) {
-    mesh.rotation.x = elapsedTime * 0.1;
-    mesh.rotation.y = elapsedTime * 0.15;
+    mesh.rotation.x += deltaTime * 0.1;
+    mesh.rotation.y += deltaTime * 0.15;
   }
 
   // Render
