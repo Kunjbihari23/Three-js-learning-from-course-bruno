@@ -1,7 +1,7 @@
+import * as CANNON from "cannon-es";
+import * as dat from "dat.gui";
 import * as THREE from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
-import * as dat from "dat.gui";
-import CANNON, { SAPBroadphase } from "cannon";
 
 /**
  * Debug
@@ -26,9 +26,17 @@ debugObj.createBox = () => {
   });
 };
 
+debugObj.reset = () => {
+  for (const obj of objToUpdate) {
+    obj.body.removeEventListener("collide", playSound);
+    world.removeBody(obj.body);
+    scene.remove(obj.mesh);
+  }
+};
+
 gui.add(debugObj, "createSphere");
 gui.add(debugObj, "createBox");
-
+gui.add(debugObj, "reset");
 /**
  * Base
  */
@@ -39,9 +47,25 @@ const canvas = document.querySelector("canvas.webgl");
 const scene = new THREE.Scene();
 
 /**
+ * Sounds
+ */
+
+const Sound = new Audio("./sounds/hit.mp3");
+
+const playSound = (event) => {
+  const ImpactStrength = event.contact.getImpactVelocityAlongNormal();
+
+  if (ImpactStrength > 0.15) {
+    Sound.currentTime = 0;
+    Sound.volume = Math.min(ImpactStrength / 5, 1);
+    Sound.play();
+  }
+};
+
+/**
  * Textures
  */
-const textureLoader = new THREE.TextureLoader();
+
 const cubeTextureLoader = new THREE.CubeTextureLoader();
 
 const environmentMapTexture = cubeTextureLoader.load([
@@ -224,7 +248,8 @@ const createSphere = (radius, position) => {
     material: defaultMaterial,
   });
   body.position.copy(position);
-  world.add(body);
+  body.addEventListener("collide", playSound);
+  world.addBody(body);
 
   // save to obj
   objToUpdate.push({ mesh, body });
@@ -250,7 +275,8 @@ const createBox = (width, height, depth, position) => {
     material: defaultMaterial,
   });
   body.position.copy(position);
-  world.add(body);
+  body.addEventListener("collide", playSound);
+  world.addBody(body);
 
   // save to obj
   objToUpdate.push({ mesh, body });
