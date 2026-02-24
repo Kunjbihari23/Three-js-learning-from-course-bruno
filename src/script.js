@@ -42,6 +42,18 @@ scene.add(object1, object2, object3);
 
 const raycaster = new THREE.Raycaster();
 
+const rayOrigin = new THREE.Vector3(-3, 0, 0);
+const rayDirection = new THREE.Vector3(10, 0, 0);
+
+rayDirection.normalize();
+
+raycaster.set(rayOrigin, rayDirection);
+
+const intersect = raycaster.intersectObject(object2);
+console.log("🚀 ~ intersect:", intersect);
+const intersects = raycaster.intersectObjects([object1, object2, object3]);
+console.log("🚀 ~ intersects:", intersects);
+
 /**
  * Sizes
  */
@@ -100,6 +112,25 @@ const tick = () => {
 
   // Update controls
   controls.update();
+
+  object1.position.y = Math.sin(elapsedTime * 0.5) * 1.5;
+  object2.position.y = Math.sin(elapsedTime * 0.3) * 1.5;
+  object3.position.y = Math.sin(elapsedTime * 0.2) * 1.5;
+
+  const rayOrigin = new THREE.Vector3(-3, 0, 0);
+  const rayDirection = new THREE.Vector3(10, 0, 0);
+
+  rayDirection.normalize();
+
+  raycaster.set(rayOrigin, rayDirection);
+
+  const intersectObjs = [object1, object2, object3];
+
+  const intersect = raycaster.intersectObject(intersectObjs[0]);
+  console.log("🚀 ~ tick ~ intersect:", intersect);
+
+  const intersects = raycaster.intersectObjects(intersectObjs);
+  console.log("🚀 ~ tick ~ intersects:", intersects);
 
   // Render
   renderer.render(scene, camera);
